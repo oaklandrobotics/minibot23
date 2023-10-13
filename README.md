@@ -20,7 +20,7 @@ To get started with the MiniBot 2023 project, follow these steps:
 1. Clone this repository to your local machine:
 
    ```bash
-   git clone https://github.com/*put your GitHub username here*/MiniBot-2023.git
+   git clone https://github.com/oaklandrobotics/MiniBot-2023.git
 
 ## Documentation
 
