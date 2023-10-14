@@ -1,14 +1,14 @@
 // Motor PWM Pins
-const int motorFL = 3; // Front-left motor
-const int motorFR = 5; // Front-right motor
-const int motorBL = 6; // Back-left motor
-const int motorBR = 9; // Back-right motor
+const int motorFL = 6; // Front-left motor
+const int motorFR = 9; // Front-right motor
+const int motorBL = 10; // Back-left motor
+const int motorBR = 3; // Back-right motor
 
 // Direction control pins
-const int dirFL = 2; // Front-left motor 
-const int dirFR = 4; // Front-right motor 
-const int dirBL = 7; // Back-left motor 
-const int dirBR = 8; // Back-right motor 
+const int dirFL = 7; // Front-left motor 
+const int dirFR = 8; // Front-right motor 
+const int dirBL = 11; // Back-left motor 
+const int dirBR = 2; // Back-right motor 
 
 // Setting Speed and Direction
 void setMotorSpeedAndDirection(int motorPin, int dirPin, int speed, int direction) {
