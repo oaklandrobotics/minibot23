@@ -1,14 +1,18 @@
+#include <PS4Controller.h>
+
 // Motor PWM Pins
 const int motorFL = 32; // Front-left motor
 const int motorFR = 19; // Front-right motor
-const int motorBL = 2; // Back-left motor
-const int motorBR = 14; // Back-right motor
+const int motorBL = 14; //2 // Back-left motor
+const int motorBR = 2; //14 // Back-right motor
 
 // Direction control pins
 const int dirFL = 33; // Front-left motor 
 const int dirFR = 21; // Front-right motor 
-const int dirBL = 4; // Back-left motor 
-const int dirBR = 12; // Back-right motor 
+const int dirBL = 12;  //4// Back-left motor 
+const int dirBR = 4; //12 // Back-right motor
+
+const int deadband = 8;
 
 // Setting Speed and Direction
 void setMotorSpeedAndDirection(int motorPin, int dirPin, int speed, int direction) {
@@ -45,7 +49,54 @@ void mecanumDrive(int x, int y, int rotation) {
   setMotorSpeedAndDirection(motorBR, dirBR, abs(BR_speed), BR_speed >= 0 ? HIGH : LOW);
 }
 
+void twoWheelDrive(int LSpeed, int RSpeed) {
+  LSpeed = map(LSpeed, -127, 127, -255, 255);
+  RSpeed = map(RSpeed, -127, 127, -255, 255);
+
+  setMotorSpeedAndDirection(motorFL, dirFL, abs(LSpeed), LSpeed >= 0 ? HIGH : LOW);
+  setMotorSpeedAndDirection(motorFR, dirFR, abs(RSpeed), RSpeed >= 0 ? HIGH : LOW);
+  setMotorSpeedAndDirection(motorBL, dirBL, abs(LSpeed), LSpeed >= 0 ? HIGH : LOW);
+  setMotorSpeedAndDirection(motorBR, dirBR, abs(RSpeed), RSpeed >= 0 ? HIGH : LOW);
+}
+
+void tankDrive(int LStick, int RStick) {
+  LStick = map(LStick, -127, 127, -255, 255);
+  RStick = map(RStick, -127, 127, -255, 255);
+  int leftWheelTurn = -RStick;
+  int rightWheelTurn = RStick;
+  int LSpeed = LStick + leftWheelTurn;
+  int RSpeed = LStick + rightWheelTurn;
+  if (abs(LSpeed) > 255)
+    LSpeed = 255;
+  if (abs(RSpeed) > 255)
+    RSpeed = 255;
+
+  setMotorSpeedAndDirection(motorFL, dirFL, abs(LSpeed), LSpeed >= 0 ? HIGH : LOW);
+  setMotorSpeedAndDirection(motorFR, dirFR, abs(RSpeed), RSpeed >= 0 ? HIGH : LOW);
+  setMotorSpeedAndDirection(motorBL, dirBL, abs(LSpeed), LSpeed >= 0 ? HIGH : LOW);
+  setMotorSpeedAndDirection(motorBR, dirBR, abs(RSpeed), RSpeed >= 0 ? HIGH : LOW);
+}
+
+void oneStickDrive(int X, int Y) {
+  X = map(X, -127, 127, -255, 255);
+  Y = map(Y, -127, 127, -255, 255);
+  int leftWheelTurn = -X;
+  int rightWheelTurn = X;
+  int LSpeed = Y + leftWheelTurn;
+  int RSpeed = Y + rightWheelTurn;
+  if (abs(LSpeed) > 255)
+    LSpeed = 255;
+  if (abs(RSpeed) > 255)
+    RSpeed = 255;
+
+  setMotorSpeedAndDirection(motorFL, dirFL, abs(LSpeed), LSpeed >= 0 ? HIGH : LOW);
+  setMotorSpeedAndDirection(motorFR, dirFR, abs(RSpeed), RSpeed >= 0 ? HIGH : LOW);
+  setMotorSpeedAndDirection(motorBL, dirBL, abs(LSpeed), LSpeed >= 0 ? HIGH : LOW);
+  setMotorSpeedAndDirection(motorBR, dirBR, abs(RSpeed), RSpeed >= 0 ? HIGH : LOW);  
+}
+
 void setup() {
+  PS4.begin("ac:89:95:6b:70:e4");
   Serial.begin(115200);
   // Initialize Direction Control Pins as OUTPUT
   pinMode(dirFL, OUTPUT);
@@ -65,11 +116,36 @@ void loop() {
 
 // Put Movement Directions Here 
 // Example:
-  delay(1000);
-  MoveRight(255);
-  delay(1000);
+  //delay(1000);
+  //MoveRight(255);
+  int leftStick = PS4.LStickY();
+  int leftStickX = PS4.LStickX();
+  int rightStick = PS4.RStickY();
+  int rightStickX = PS4.RStickX();
+  if (abs(leftStick) < deadband)
+    leftStick = 0;
+  if (abs(leftStickX) < deadband)
+    leftStickX = 0;
+  if (abs(rightStick) < deadband)
+    rightStick = 0;
+  if (abs(rightStickX) < deadband)
+    rightStickX = 0;
+
+  //twoWheelDrive(leftStick, rightStick);
+  //tankDrive(leftStick, rightStickX);
+  //oneStickDrive(leftStickX, leftStick);
+  // For mecanum drive
+  leftStickX = map(leftStickX, -127, 127, -255, 255);
+  leftStick = map(leftStick, -127, 127, -255, 255);
+  rightStickX = map(rightStickX, -127, 127, -255, 255);
+  mecanumDrive(leftStickX, leftStick, rightStickX);
+  //delay(1000);
 // This moves forward full speed for 1 second
-  Serial.println("Driving");
+  //Serial.println("Driving");
+  Serial.printf("Left X: %d\n", PS4.LStickX());
+  Serial.printf("Left Y: %d\n",PS4.LStickY());
+  Serial.printf("Right X: %d\n",PS4.RStickX());
+  Serial.printf("Right Y: %d\n",PS4.RStickY());
 }
 
 void MoveForward(int Speed) {
