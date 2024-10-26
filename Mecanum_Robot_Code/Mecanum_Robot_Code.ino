@@ -12,7 +12,7 @@ const int dirFR = 21; // Front-right motor
 const int dirBL = 12;  //4// Back-left motor 
 const int dirBR = 4; //12 // Back-right motor
 
-const int deadband = 8;
+const int deadband = 9;
 
 // Setting Speed and Direction
 void setMotorSpeedAndDirection(int motorPin, int dirPin, int speed, int direction) {
@@ -67,9 +67,15 @@ void tankDrive(int LStick, int RStick) {
   int LSpeed = LStick + leftWheelTurn;
   int RSpeed = LStick + rightWheelTurn;
   if (abs(LSpeed) > 255)
-    LSpeed = 255;
+    if (LSpeed < 0)
+      LSpeed = -255;
+    else
+      LSpeed = 255;
   if (abs(RSpeed) > 255)
-    RSpeed = 255;
+    if (RSpeed < 0)
+      RSpeed = -255;
+    else
+      RSpeed = 255;
 
   setMotorSpeedAndDirection(motorFL, dirFL, abs(LSpeed), LSpeed >= 0 ? HIGH : LOW);
   setMotorSpeedAndDirection(motorFR, dirFR, abs(RSpeed), RSpeed >= 0 ? HIGH : LOW);
@@ -85,9 +91,15 @@ void oneStickDrive(int X, int Y) {
   int LSpeed = Y + leftWheelTurn;
   int RSpeed = Y + rightWheelTurn;
   if (abs(LSpeed) > 255)
-    LSpeed = 255;
+    if (LSpeed < 0)
+      LSpeed = -255;
+    else
+      LSpeed = 255;
   if (abs(RSpeed) > 255)
-    RSpeed = 255;
+    if (RSpeed < 0)
+      RSpeed = -255;
+    else
+      RSpeed = 255;
 
   setMotorSpeedAndDirection(motorFL, dirFL, abs(LSpeed), LSpeed >= 0 ? HIGH : LOW);
   setMotorSpeedAndDirection(motorFR, dirFR, abs(RSpeed), RSpeed >= 0 ? HIGH : LOW);
